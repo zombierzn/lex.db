@@ -9,10 +9,14 @@ namespace Lex.Db
 {
   using Serialization;
 
-  /// <summary>
-  /// Entity type to table mapping base
-  /// </summary>
-  public abstract class TypeMap
+    /// <summary>
+    /// Entity type to table mapping base
+    /// </summary>
+#if !WINRT_COMPONENT && !HIDE_PUBLIC
+    public abstract class TypeMap
+#else
+    internal abstract class TypeMap
+#endif
   {
     /// <summary>
     /// Indicates name of the table
@@ -78,13 +82,18 @@ namespace Lex.Db
   /// </summary>
   /// <typeparam name="T"></typeparam>
   [DebuggerDisplay("{Name}")]
-  public sealed class TypeMap<T> : TypeMap where T : class
+#if !WINRT_COMPONENT && !HIDE_PUBLIC
+    public sealed class TypeMap_1<T> : TypeMap
+#else
+    internal sealed class TypeMap_1<T> : TypeMap
+#endif
+    where T : class
   {
     readonly DbInstance _db;
     readonly Func<T> _ctor;
-    DbTable<T> _table;
+    DbTable_1<T> _table;
 
-    internal TypeMap(DbInstance db, Func<T> ctor)
+    internal TypeMap_1(DbInstance db, Func<T> ctor)
     {
       _db = db;
       _ctor = ctor;
@@ -93,7 +102,7 @@ namespace Lex.Db
 
     internal override void Clear()
     {
-      _table = new DbTable<T>(_db, _ctor);
+      _table = new DbTable_1<T>(_db, _ctor);
     }
 
     /// <summary>
@@ -106,7 +115,7 @@ namespace Lex.Db
     /// </summary>
     /// <param name="name">Name of the table file without extension</param>
     /// <returns>Entity type mapping to continue with</returns>
-    public TypeMap<T> ToTable(string name)
+    public TypeMap_1<T> ToTable(string name)
     {
       if (string.IsNullOrEmpty(name))
         throw new ArgumentException("name");
@@ -119,7 +128,7 @@ namespace Lex.Db
     /// Resets all mappings
     /// </summary>
     /// <returns>Entity type mapping to continue with</returns>
-    public TypeMap<T> Reset()
+    public TypeMap_1<T> Reset()
     {
       Clear();
       return this;
@@ -130,7 +139,7 @@ namespace Lex.Db
     /// </summary>
     /// <param name="interceptor">Custom interceptor implementation</param>
     /// <returns>Entity type mapping to continue with</returns>
-    public TypeMap<T> WithInterceptor(Interceptor<T> interceptor)
+    public TypeMap_1<T> WithInterceptor(Interceptor<T> interceptor)
     {
       if (interceptor == null)
         throw new ArgumentNullException();
@@ -145,7 +154,7 @@ namespace Lex.Db
     /// </summary>
     /// <param name="interceptor">Custom interceptor function</param>
     /// <returns>Entity type mapping to continue with</returns>
-    public TypeMap<T> WithInterceptor(Func<T, string, bool?> interceptor)
+    public TypeMap_1<T> WithInterceptor(Func<T, string, bool?> interceptor)
     {
       if (interceptor == null)
         throw new ArgumentNullException();
@@ -165,7 +174,7 @@ namespace Lex.Db
     /// <param name="autoGen">Indicates automatic generation of PK values (int, long, Guid types only)</param>
     /// <param name="comparer">Optional primary key comparer</param>
     /// <returns>Entity type mapping to continue with</returns>
-    public TypeMap<T> Key<K>(Expression<Func<T, K>> keyBuilder, bool autoGen = false, IComparer<K> comparer = null)
+    public TypeMap_1<T> Key<K>(Expression<Func<T, K>> keyBuilder, bool autoGen = false, IComparer<K> comparer = null)
     {
       if (_key != null)
         throw new InvalidOperationException("Key is already defined");
@@ -184,7 +193,7 @@ namespace Lex.Db
     /// <param name="autoGen">Indicates automatic generation of PK values (int, long, Guid types only)</param>
     /// <param name="comparer">Optional primary key comparer</param>
     /// <returns>Entity type mapping to continue with</returns>
-    public TypeMap<T> Automap<K>(Expression<Func<T, K>> keyBuilder, bool autoGen = false, IComparer<K> comparer = null)
+    public TypeMap_1<T> Automap<K>(Expression<Func<T, K>> keyBuilder, bool autoGen = false, IComparer<K> comparer = null)
     {
       return Key(keyBuilder, autoGen, comparer).MapAll();
     }
@@ -248,7 +257,7 @@ namespace Lex.Db
     /// Defines complete mapping for public properties and fields via reflection
     /// </summary>
     /// <returns>Entity type mapping to continue with</returns>
-    public TypeMap<T> MapAll()
+    public TypeMap_1<T> MapAll()
     {
 #if NETFX_CORE
       if (!typeof(T).GetTypeInfo().IsInterface)
@@ -263,7 +272,7 @@ namespace Lex.Db
                      select f;
 
         foreach (var f in fields)
-          _table.Add(new MemberMap<T>(f));
+          _table.Add(new MemberMapT<T>(f));
       }
 
       var properties = from p in typeof(T).GetPublicInstanceProperties()
@@ -273,7 +282,7 @@ namespace Lex.Db
                        select p;
 
       foreach (var p in properties)
-        _table.Add(new MemberMap<T>(p));
+        _table.Add(new MemberMapT<T>(p));
 
       return this;
     }
@@ -284,7 +293,7 @@ namespace Lex.Db
     /// <typeparam name="K">Type of the member</typeparam>
     /// <param name="property">Member access expression</param>
     /// <returns>Entity type mapping to continue with</returns>
-    public TypeMap<T> Unmap<K>(Expression<Func<T, K>> property)
+    public TypeMap_1<T> Unmap<K>(Expression<Func<T, K>> property)
     {
       var member = ExtractMember(property);
       if (member == null)
@@ -301,14 +310,14 @@ namespace Lex.Db
     /// <typeparam name="K">Type of the member</typeparam>
     /// <param name="property">Members access expression (public readable/writable property or field)</param>
     /// <returns>Entity type mapping to continue with</returns>
-    public TypeMap<T> Map<K>(Expression<Func<T, K>> property)
+    public TypeMap_1<T> Map<K>(Expression<Func<T, K>> property)
     {
       Expression target;
       var member = ExtractMemberEx(property, out target);
       if (member == null)
         throw new ArgumentException("Invalid member definition");
 
-      _table.Add(new MemberMap<T>(member, target, property.Parameters[0]));
+      _table.Add(new MemberMapT<T>(member, target, property.Parameters[0]));
 
       return this;
     }
@@ -321,7 +330,7 @@ namespace Lex.Db
     /// <param name="indexBy">Indexing expression</param>
     /// <param name="comparer">Optional comparer for indexing expression</param>
     /// <returns>Entity type mapping to continue with</returns>
-    public TypeMap<T> WithIndex<I1>(string name, Expression<Func<T, I1>> indexBy, IComparer<I1> comparer = null)
+    public TypeMap_1<T> WithIndex<I1>(string name, Expression<Func<T, I1>> indexBy, IComparer<I1> comparer = null)
     {
       CheckIndexDoesNotExists(name);
 
@@ -349,7 +358,7 @@ namespace Lex.Db
     /// <param name="comparerIndexBy">Optional comparer for first index key component</param>
     /// <param name="comparerThenBy">Optional comparer for second index key component</param>
     /// <returns>Entity type mapping to continue with</returns>
-    public TypeMap<T> WithIndex<I1, I2>(string name, Expression<Func<T, I1>> indexBy, Expression<Func<T, I2>> thenBy, IComparer<I1> comparerIndexBy = null, IComparer<I2> comparerThenBy = null)
+    public TypeMap_1<T> WithIndex<I1, I2>(string name, Expression<Func<T, I1>> indexBy, Expression<Func<T, I2>> thenBy, IComparer<I1> comparerIndexBy = null, IComparer<I2> comparerThenBy = null)
     {
       CheckIndexDoesNotExists(name);
 
@@ -377,7 +386,7 @@ namespace Lex.Db
     /// <param name="comparerThenBy">Optional comparer for second index key component</param>
     /// <param name="comparerAndThenBy">Optional comparer for thirt index key component</param>
     /// <returns>Entity type mapping to continue with</returns>
-    public TypeMap<T> WithIndex<I1, I2, I3>(string name, Expression<Func<T, I1>> indexBy, Expression<Func<T, I2>> thenBy, Expression<Func<T, I3>> andThenBy, IComparer<I1> comparerIndexBy = null, IComparer<I2> comparerThenBy = null, IComparer<I3> comparerAndThenBy = null)
+    public TypeMap_1<T> WithIndex<I1, I2, I3>(string name, Expression<Func<T, I1>> indexBy, Expression<Func<T, I2>> thenBy, Expression<Func<T, I3>> andThenBy, IComparer<I1> comparerIndexBy = null, IComparer<I2> comparerThenBy = null, IComparer<I3> comparerAndThenBy = null)
     {
       CheckIndexDoesNotExists(name);
 

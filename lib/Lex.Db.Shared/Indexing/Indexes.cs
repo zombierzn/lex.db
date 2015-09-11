@@ -10,7 +10,7 @@ namespace Lex.Db
 
   interface IIndex<T> where T : class
   {
-    DbTable<T> Table { get; }
+    DbTable_1<T> Table { get; }
     MemberInfo[] Keys { get; }
 
     void Read(DataReader reader, DbFormat format);
@@ -21,7 +21,7 @@ namespace Lex.Db
     int Count { get; }
   }
 
-  interface IIndex<T, K> : IIndex<T> where T : class
+  interface IIndex_2<T, K> : IIndex<T> where T : class
   {
     int ExecuteCount(IndexQueryArgs<K> args);
     List<T> ExecuteToList(IndexQueryArgs<K> args);
@@ -49,10 +49,14 @@ namespace Lex.Db
     }
   }
 
-  /// <summary>
-  /// Query via index interface
-  /// </summary>
-  public interface IIndexQuery
+    /// <summary>
+    /// Query via index interface
+    /// </summary>
+#if !WINRT_COMPONENT && !HIDE_PUBLIC
+    public interface IIndexQuery
+#else
+    internal interface IIndexQuery
+#endif
   {
     /// <summary>
     /// Counts the number of the indexed entities identitified by the query
@@ -68,12 +72,17 @@ namespace Lex.Db
     List<K> ToIdList<K>();
   }
 
-  /// <summary>
-  /// Typed query via index interface
-  /// </summary>
-  /// <typeparam name="T">Entity type</typeparam>
-  public interface IIndexQuery<T> : IIndexQuery where T : class
-  {
+    /// <summary>
+    /// Typed query via index interface
+    /// </summary>
+    /// <typeparam name="T">Entity type</typeparam>
+#if !WINRT_COMPONENT && !HIDE_PUBLIC
+    public interface IIndexQuery_1<T> : IIndexQuery
+#else
+    internal interface IIndexQuery_1<T> : IIndexQuery
+#endif
+  where T : class
+    {
     /// <summary>
     /// Loads entities returned by the query
     /// </summary>
@@ -81,97 +90,105 @@ namespace Lex.Db
     List<T> ToList();
   }
 
-  /// <summary>
-  /// Typed query via index interface
-  /// </summary>
-  /// <typeparam name="T">Entity type</typeparam>
-  /// <typeparam name="I1">Type of the indexed member</typeparam>
-  public interface IIndexQuery<T, I1> : IIndexQuery<T>
+    /// <summary>
+    /// Typed query via index interface
+    /// </summary>
+    /// <typeparam name="T">Entity type</typeparam>
+    /// <typeparam name="I1">Type of the indexed member</typeparam>
+#if !WINRT_COMPONENT && !HIDE_PUBLIC
+    public interface IIndexQuery_2<T, I1> : IIndexQuery_1<T>
+#else
+    internal interface IIndexQuery_2<T, I1> : IIndexQuery_1<T>
+#endif
     where T : class
   {
     /// <summary>
     /// Lazy loads entities returned by the query
     /// </summary>
     /// <returns>List of lazy-loaded entities identitified by the query</returns>
-    List<Lazy<T, I1>> ToLazyList();
+    List<Lazy_2<T, I1>> ToLazyList();
 
     /// <summary>
     /// Returns a specified number of contiguous entities from the start of a query.
     /// </summary>
     /// <param name="count">The number of elements to return.</param>
     /// <returns>A new query that returns the specified number of entities.</returns>
-    IIndexQuery<T, I1> Take(int count);
+    IIndexQuery_2<T, I1> Take(int count);
 
     /// <summary>
     /// Bypasses a specified number of entities in a query and then returns the remaining entities.
     /// </summary>
     /// <param name="count">The number of entities to skip before returning the remaining entities.</param>
     /// <returns>A new query that bypasses the specified number of entities.</returns>
-    IIndexQuery<T, I1> Skip(int count);
+    IIndexQuery_2<T, I1> Skip(int count);
 
     /// <summary>
     /// Returns entities with specified lower bound
     /// </summary>
-    IIndexQuery<T, I1> GreaterThan(I1 key, bool orEqual = false);
+    IIndexQuery_2<T, I1> GreaterThan(I1 key, bool orEqual = false);
 
     /// <summary>
     /// Returns entities with specified upper bound
     /// </summary>
-    IIndexQuery<T, I1> LessThan(I1 key, bool orEqual = false);
+    IIndexQuery_2<T, I1> LessThan(I1 key, bool orEqual = false);
 
     /// <summary>
     /// Returns entities with specified key value 
     /// </summary>
     /// <param name="key">Key value</param>
     /// <returns>A new query that returns entities with specified key value.</returns>
-    IIndexQuery<T, I1> Key(I1 key);
+    IIndexQuery_2<T, I1> Key(I1 key);
 
     /// <summary>
     /// Returns entities with filtered key values
     /// </summary>
     /// <param name="predicate">Predicate function to filter entities</param>
     /// <returns>A new query that returns entities with filtered key values.</returns>
-    IIndexQuery<T, I1> Where(Func<I1, bool> predicate);
+    IIndexQuery_2<T, I1> Where(Func<I1, bool> predicate);
   }
 
-  /// <summary>
-  /// Typed query via 2-component index interface 
-  /// </summary>
-  /// <typeparam name="T">Entity type</typeparam>
-  /// <typeparam name="I1">Type of the first component indexed member</typeparam>
-  /// <typeparam name="I2">Type of the second component indexed member</typeparam>
-  public interface IIndexQuery<T, I1, I2> : IIndexQuery<T>
-    where T : class
-  {
+    /// <summary>
+    /// Typed query via 2-component index interface 
+    /// </summary>
+    /// <typeparam name="T">Entity type</typeparam>
+    /// <typeparam name="I1">Type of the first component indexed member</typeparam>
+    /// <typeparam name="I2">Type of the second component indexed member</typeparam>
+#if !WINRT_COMPONENT && !HIDE_PUBLIC
+    public interface IIndexQuery_3<T, I1, I2> : IIndexQuery_1<T>
+#else
+    internal interface IIndexQuery_3<T, I1, I2> : IIndexQuery_1<T>
+#endif
+  where T : class
+    {
     /// <summary>
     /// Lazy loads entities returned by the query
     /// </summary>
     /// <returns>List of lazy-loaded entities identitified by the query</returns>
-    List<Lazy<T, I1, I2>> ToLazyList();
+    List<Lazy_3<T, I1, I2>> ToLazyList();
 
     /// <summary>
     /// Returns a specified number of contiguous entities from the start of a query.
     /// </summary>
     /// <param name="count">The number of elements to return.</param>
     /// <returns>A new query that returns the specified number of entities.</returns>
-    IIndexQuery<T, I1, I2> Take(int count);
+    IIndexQuery_3<T, I1, I2> Take(int count);
 
     /// <summary>
     /// Bypasses a specified number of entities in a query and then returns the remaining entities.
     /// </summary>
     /// <param name="count">The number of entities to skip before returning the remaining entities.</param>
     /// <returns>A new query that bypasses the specified number of entities.</returns>
-    IIndexQuery<T, I1, I2> Skip(int count);
+    IIndexQuery_3<T, I1, I2> Skip(int count);
 
     /// <summary>
     /// Returns entities with specified 2-component lower bound
     /// </summary>
-    IIndexQuery<T, I1, I2> GreaterThan(I1 key1, I2 key2 = default(I2), bool inclusive = false);
+    IIndexQuery_3<T, I1, I2> GreaterThan(I1 key1, I2 key2 = default(I2), bool inclusive = false);
 
     /// <summary>
     /// Returns entities with specified 2-component upper bound
     /// </summary>
-    IIndexQuery<T, I1, I2> LessThan(I1 key1, I2 key2 = default(I2), bool inclusive = false);
+    IIndexQuery_3<T, I1, I2> LessThan(I1 key1, I2 key2 = default(I2), bool inclusive = false);
 
     /// <summary>
     /// Returns entities with specified 2-component key value 
@@ -179,55 +196,59 @@ namespace Lex.Db
     /// <param name="key1">First component key value</param>
     /// <param name="key2">Second component key value</param>
     /// <returns>A new query that returns entities with specified key value.</returns>
-    IIndexQuery<T, I1, I2> Key(I1 key1, I2 key2);
+    IIndexQuery_3<T, I1, I2> Key(I1 key1, I2 key2);
 
     /// <summary>
     /// Returns entities with filtered key values
     /// </summary>
     /// <param name="predicate">Predicate function to filter entities</param>
     /// <returns>A new query that returns entities with filtered key values.</returns>
-    IIndexQuery<T, I1, I2> Where(Func<I1, I2, bool> predicate);
+    IIndexQuery_3<T, I1, I2> Where(Func<I1, I2, bool> predicate);
   }
 
-  /// <summary>
-  /// Typed query via 3-component index interface
-  /// </summary>
-  /// <typeparam name="T">Entity type</typeparam>
-  /// <typeparam name="I1">Type of the first component indexed member</typeparam>
-  /// <typeparam name="I2">Type of the second component indexed member</typeparam>
-  /// <typeparam name="I3">Type of the third component indexed member</typeparam>
-  public interface IIndexQuery<T, I1, I2, I3> : IIndexQuery<T>
+    /// <summary>
+    /// Typed query via 3-component index interface
+    /// </summary>
+    /// <typeparam name="T">Entity type</typeparam>
+    /// <typeparam name="I1">Type of the first component indexed member</typeparam>
+    /// <typeparam name="I2">Type of the second component indexed member</typeparam>
+    /// <typeparam name="I3">Type of the third component indexed member</typeparam>
+#if !WINRT_COMPONENT && !HIDE_PUBLIC
+    public interface IIndexQuery_4<T, I1, I2, I3> : IIndexQuery_1<T>
+#else
+    internal interface IIndexQuery_4<T, I1, I2, I3> : IIndexQuery_1<T>
+#endif
     where T : class
   {
     /// <summary>
     /// Lazy loads entities returned by the query
     /// </summary>
     /// <returns>List of lazy-loaded entities identitified by the query</returns>
-    List<Lazy<T, I1, I2, I3>> ToLazyList();
+    List<Lazy_4<T, I1, I2, I3>> ToLazyList();
 
     /// <summary>
     /// Returns a specified number of contiguous entities from the start of a query.
     /// </summary>
     /// <param name="count">The number of elements to return.</param>
     /// <returns>A new query that returns the specified number of entities.</returns>
-    IIndexQuery<T, I1, I2, I3> Take(int count);
+    IIndexQuery_4<T, I1, I2, I3> Take(int count);
 
     /// <summary>
     /// Bypasses a specified number of entities in a query and then returns the remaining entities.
     /// </summary>
     /// <param name="count">The number of entities to skip before returning the remaining entities.</param>
     /// <returns>A new query that bypasses the specified number of entities.</returns>
-    IIndexQuery<T, I1, I2, I3> Skip(int count);
+    IIndexQuery_4<T, I1, I2, I3> Skip(int count);
 
     /// <summary>
     /// Returns entities with specified 3-component lower bound
     /// </summary>
-    IIndexQuery<T, I1, I2, I3> GreaterThan(I1 key1, I2 key2 = default(I2), I3 key3 = default(I3), bool inclusive = false);
+    IIndexQuery_4<T, I1, I2, I3> GreaterThan(I1 key1, I2 key2 = default(I2), I3 key3 = default(I3), bool inclusive = false);
 
     /// <summary>
     /// Returns entities with specified 3-component upper bound
     /// </summary>
-    IIndexQuery<T, I1, I2, I3> LessThan(I1 key1, I2 key2 = default(I2), I3 key3 = default(I3), bool inclusive = false);
+    IIndexQuery_4<T, I1, I2, I3> LessThan(I1 key1, I2 key2 = default(I2), I3 key3 = default(I3), bool inclusive = false);
 
     /// <summary>
     /// Returns entities with specified 3-component key value 
@@ -236,24 +257,24 @@ namespace Lex.Db
     /// <param name="key2">Second component key value</param>
     /// <param name="key3">Third component key value</param>
     /// <returns>A new query that returns entities with specified key value.</returns>
-    IIndexQuery<T, I1, I2, I3> Key(I1 key1, I2 key2, I3 key3);
+    IIndexQuery_4<T, I1, I2, I3> Key(I1 key1, I2 key2, I3 key3);
 
     /// <summary>
     /// Returns entities with filtered key values
     /// </summary>
     /// <param name="predicate">Predicate function to filter entities</param>
     /// <returns>A new query that returns entities with filtered key values.</returns>
-    IIndexQuery<T, I1, I2, I3> Where(Func<I1, I2, I3, bool> predicate);
+    IIndexQuery_4<T, I1, I2, I3> Where(Func<I1, I2, I3, bool> predicate);
   }
 
   abstract class IndexQueryBase<T, K, R>
     where T : class
     where R : class
   {
-    protected readonly IIndex<T, K> _index;
+    protected readonly IIndex_2<T, K> _index;
     protected readonly IndexQueryArgs<K> _args;
 
-    public IndexQueryBase(IIndex<T, K> index)
+    public IndexQueryBase(IIndex_2<T, K> index)
     {
       _index = index;
       _args = new IndexQueryArgs<K>();
@@ -323,92 +344,92 @@ namespace Lex.Db
     }
   }
 
-  class IndexQuery<T, I1> : IndexQueryBase<T, I1, IIndexQuery<T, I1>>, IIndexQuery<T, I1> where T : class
+  class IndexQuery<T, I1> : IndexQueryBase<T, I1, IIndexQuery_2<T, I1>>, IIndexQuery_2<T, I1> where T : class
   {
     IndexQuery(IndexQuery<T, I1> source) : base(source) { }
 
-    public IndexQuery(IIndex<T, I1> index) : base(index) { }
+    public IndexQuery(IIndex_2<T, I1> index) : base(index) { }
 
-    public List<Lazy<T, I1>> ToLazyList()
+    public List<Lazy_2<T, I1>> ToLazyList()
     {
       return _index.ExecuteToList(_args, _index.Table.LazyCtor<I1>);
     }
 
-    protected override IIndexQuery<T, I1> Clone()
+    protected override IIndexQuery_2<T, I1> Clone()
     {
       return new IndexQuery<T, I1>(this);
     }
   }
 
-  class IndexQuery<T, I1, I2> : IndexQueryBase<T, Indexer<I1, I2>, IIndexQuery<T, I1, I2>>, IIndexQuery<T, I1, I2> where T : class
+  class IndexQuery_3<T, I1, I2> : IndexQueryBase<T, Indexer<I1, I2>, IIndexQuery_3<T, I1, I2>>, IIndexQuery_3<T, I1, I2> where T : class
   {
-    IndexQuery(IndexQuery<T, I1, I2> source) : base(source) { }
+    IndexQuery_3(IndexQuery_3<T, I1, I2> source) : base(source) { }
 
-    public IndexQuery(IIndex<T, Indexer<I1, I2>> index) : base(index) { }
+    public IndexQuery_3(IIndex_2<T, Indexer<I1, I2>> index) : base(index) { }
 
-    public List<Lazy<T, I1, I2>> ToLazyList()
+    public List<Lazy_3<T, I1, I2>> ToLazyList()
     {
       return _index.ExecuteToList(_args, _index.Table.LazyCtor<I1, I2>);
     }
 
-    public IIndexQuery<T, I1, I2> GreaterThan(I1 key1, I2 key2 = default(I2), bool inclusive = false)
+    public IIndexQuery_3<T, I1, I2> GreaterThan(I1 key1, I2 key2 = default(I2), bool inclusive = false)
     {
       return GreaterThan(new Indexer<I1, I2>(key1, key2), inclusive);
     }
 
-    public IIndexQuery<T, I1, I2> LessThan(I1 key1, I2 key2 = default(I2), bool inclusive = false)
+    public IIndexQuery_3<T, I1, I2> LessThan(I1 key1, I2 key2 = default(I2), bool inclusive = false)
     {
       return LessThan(new Indexer<I1, I2>(key1, key2), inclusive);
     }
 
-    public IIndexQuery<T, I1, I2> Key(I1 key1, I2 key2)
+    public IIndexQuery_3<T, I1, I2> Key(I1 key1, I2 key2)
     {
       return Key(new Indexer<I1, I2>(key1, key2));
     }
 
-    protected override IIndexQuery<T, I1, I2> Clone()
+    protected override IIndexQuery_3<T, I1, I2> Clone()
     {
-      return new IndexQuery<T, I1, I2>(this);
+      return new IndexQuery_3<T, I1, I2>(this);
     }
 
-    public IIndexQuery<T, I1, I2> Where(Func<I1, I2, bool> predicate)
+    public IIndexQuery_3<T, I1, I2> Where(Func<I1, I2, bool> predicate)
     {
       return base.Where(k => predicate(k.Key1, k.Key2));
     }
   }
 
-  class IndexQuery<T, I1, I2, I3> : IndexQueryBase<T, Indexer<I1, I2, I3>, IIndexQuery<T, I1, I2, I3>>, IIndexQuery<T, I1, I2, I3> where T : class
+  class IndexQuery_4<T, I1, I2, I3> : IndexQueryBase<T, Indexer_3<I1, I2, I3>, IIndexQuery_4<T, I1, I2, I3>>, IIndexQuery_4<T, I1, I2, I3> where T : class
   {
-    IndexQuery(IndexQuery<T, I1, I2, I3> source) : base(source) { }
+    IndexQuery_4(IndexQuery_4<T, I1, I2, I3> source) : base(source) { }
 
-    public IndexQuery(IIndex<T, Indexer<I1, I2, I3>> index) : base(index) { }
+    public IndexQuery_4(IIndex_2<T, Indexer_3<I1, I2, I3>> index) : base(index) { }
 
-    public List<Lazy<T, I1, I2, I3>> ToLazyList()
+    public List<Lazy_4<T, I1, I2, I3>> ToLazyList()
     {
       return _index.ExecuteToList(_args, _index.Table.LazyCtor<I1, I2, I3>);
     }
 
-    public IIndexQuery<T, I1, I2, I3> GreaterThan(I1 key1, I2 key2 = default(I2), I3 key3 = default(I3), bool inclusive = false)
+    public IIndexQuery_4<T, I1, I2, I3> GreaterThan(I1 key1, I2 key2 = default(I2), I3 key3 = default(I3), bool inclusive = false)
     {
-      return GreaterThan(new Indexer<I1, I2, I3>(key1, key2, key3), inclusive);
+      return GreaterThan(new Indexer_3<I1, I2, I3>(key1, key2, key3), inclusive);
     }
 
-    public IIndexQuery<T, I1, I2, I3> LessThan(I1 key1, I2 key2 = default(I2), I3 key3 = default(I3), bool inclusive = false)
+    public IIndexQuery_4<T, I1, I2, I3> LessThan(I1 key1, I2 key2 = default(I2), I3 key3 = default(I3), bool inclusive = false)
     {
-      return LessThan(new Indexer<I1, I2, I3>(key1, key2, key3), inclusive);
+      return LessThan(new Indexer_3<I1, I2, I3>(key1, key2, key3), inclusive);
     }
 
-    public IIndexQuery<T, I1, I2, I3> Key(I1 key1, I2 key2, I3 key3)
+    public IIndexQuery_4<T, I1, I2, I3> Key(I1 key1, I2 key2, I3 key3)
     {
-      return Key(new Indexer<I1, I2, I3>(key1, key2, key3));
+      return Key(new Indexer_3<I1, I2, I3>(key1, key2, key3));
     }
 
-    protected override IIndexQuery<T, I1, I2, I3> Clone()
+    protected override IIndexQuery_4<T, I1, I2, I3> Clone()
     {
-      return new IndexQuery<T, I1, I2, I3>(this);
+      return new IndexQuery_4<T, I1, I2, I3>(this);
     }
 
-    public IIndexQuery<T, I1, I2, I3> Where(Func<I1, I2, I3, bool> predicate)
+    public IIndexQuery_4<T, I1, I2, I3> Where(Func<I1, I2, I3, bool> predicate)
     {
       return base.Where(k => predicate(k.Key1, k.Key2, k.Key3));
     }

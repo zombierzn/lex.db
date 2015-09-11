@@ -17,10 +17,14 @@ namespace Lex.Db
   using Mapping;
   using Serialization;
 
-  /// <summary>
-  /// Abstract database table interface
-  /// </summary>
-  public abstract class DbTable
+    /// <summary>
+    /// Abstract database table interface
+    /// </summary>
+#if !WINRT_COMPONENT && !HIDE_PUBLIC
+    public abstract class DbTable
+#else
+    internal abstract class DbTable
+#endif
   {
     internal IDbTableStorage Storage;
 
@@ -136,7 +140,11 @@ namespace Lex.Db
   /// </summary>
   /// <typeparam name="T">Table entity class</typeparam>
   [DebuggerDisplay("{Name}")]
-  public sealed class DbTable<T> : DbTable, IEnumerable<T> where T : class
+#if !WINRT_COMPONENT && !HIDE_PUBLIC
+    public sealed class DbTable_1<T> : DbTable, IEnumerable<T> where T : class
+#else
+    internal sealed class DbTable_1<T> : DbTable, IEnumerable<T> where T : class
+#endif
   {
 #if NLOG
     static readonly Logger Log = LogManager.GetCurrentClassLogger();
@@ -144,8 +152,8 @@ namespace Lex.Db
 
     internal readonly Metadata<T> Metadata = new Metadata<T>();
     internal readonly Func<T> Ctor;
-    internal IKeyIndex<T> KeyIndex;
-    Action<T, IKeyIndex<T>> _autoGen;
+    internal IKeyIndex_1<T> KeyIndex;
+    Action<T, IKeyIndex_1<T>> _autoGen;
 
     Dictionary<string, IDataIndex<T>> _indexes;
 
@@ -163,7 +171,7 @@ namespace Lex.Db
 
     readonly DbInstance _db;
 
-    internal DbTable(DbInstance db, Func<T> ctor)
+    internal DbTable_1(DbInstance db, Func<T> ctor)
     {
       _db = db;
       Ctor = ctor;
@@ -238,7 +246,7 @@ namespace Lex.Db
       //      item.Member = ((KeyIndex<T,long>)index).MaxKey + 1;
       // }
       var obj = Expression.Parameter(typeof(T));
-      var index = Expression.Parameter(typeof(IKeyIndex<T>));
+      var index = Expression.Parameter(typeof(IKeyIndex_1<T>));
       var member = obj.Member(key);
 
       var indexLong = Expression.Convert(index, typeof(KeyIndex<T, long>));
@@ -246,7 +254,7 @@ namespace Lex.Db
       var setter = Expression.Assign(member, Expression.Add(lastValue, Expression.Constant(1L)));
 
       var ifBlock = Expression.IfThen(Expression.Equal(member, Expression.Constant(0L)), setter);
-      var lambda = Expression.Lambda<Action<T, IKeyIndex<T>>>(ifBlock, obj, index);
+      var lambda = Expression.Lambda<Action<T, IKeyIndex_1<T>>>(ifBlock, obj, index);
       _autoGen = lambda.Compile();
 #endif
     }
@@ -270,7 +278,7 @@ namespace Lex.Db
       //      item.Member = ((KeyIndex<T,int>)index).GetMaxValue() + 1;
       // }
       var obj = Expression.Parameter(typeof(T));
-      var index = Expression.Parameter(typeof(IKeyIndex<T>));
+      var index = Expression.Parameter(typeof(IKeyIndex_1<T>));
       var member = obj.Member(key);
 
       var indexInt = Expression.Convert(index, typeof(KeyIndex<T, int>));
@@ -278,7 +286,7 @@ namespace Lex.Db
       var setter = Expression.Assign(member, Expression.Add(lastValue, Expression.Constant(1)));
 
       var ifBlock = Expression.IfThen(Expression.Equal(member, Expression.Constant(0)), setter);
-      var lambda = Expression.Lambda<Action<T, IKeyIndex<T>>>(ifBlock, obj, index);
+      var lambda = Expression.Lambda<Action<T, IKeyIndex_1<T>>>(ifBlock, obj, index);
       _autoGen = lambda.Compile();
 #endif
     }
@@ -302,19 +310,19 @@ namespace Lex.Db
       //      item.Member = Guid.NewGuid();
       // }
       var obj = Expression.Parameter(typeof(T));
-      var index = Expression.Parameter(typeof(IKeyIndex<T>));
+      var index = Expression.Parameter(typeof(IKeyIndex_1<T>));
       var member = obj.Member(key);
 
       var gen = Expression.Call(typeof(Guid).GetPublicStaticMethod("NewGuid"));
       var setter = Expression.Assign(member, gen);
 
       var ifBlock = Expression.IfThen(Expression.Equal(member, Expression.Constant(Guid.Empty)), setter);
-      var lambda = Expression.Lambda<Action<T, IKeyIndex<T>>>(ifBlock, obj, index);
+      var lambda = Expression.Lambda<Action<T, IKeyIndex_1<T>>>(ifBlock, obj, index);
       _autoGen = lambda.Compile();
 #endif
     }
 
-    internal void Add(MemberMap<T> map)
+    internal void Add(MemberMapT<T> map)
     {
       Debug.WriteLine("Adding {0} Mapping {1}", typeof(T), map.Member.Name);
 
@@ -346,19 +354,19 @@ namespace Lex.Db
 
     #region Index ctors
 
-    internal Lazy<T, I1> LazyCtor<I1>(I1 key, IKeyNode node)
+    internal Lazy_2<T, I1> LazyCtor<I1>(I1 key, IKeyNode node)
     {
-      return new Lazy<T, I1>(this, node.Key, key);
+      return new Lazy_2<T, I1>(this, node.Key, key);
     }
 
-    internal Lazy<T, I1, I2> LazyCtor<I1, I2>(Indexer<I1, I2> key, IKeyNode node)
+    internal Lazy_3<T, I1, I2> LazyCtor<I1, I2>(Indexer<I1, I2> key, IKeyNode node)
     {
-      return new Lazy<T, I1, I2>(this, node.Key, key);
+      return new Lazy_3<T, I1, I2>(this, node.Key, key);
     }
 
-    internal Lazy<T, I1, I2, I3> LazyCtor<I1, I2, I3>(Indexer<I1, I2, I3> key, IKeyNode node)
+    internal Lazy_4<T, I1, I2, I3> LazyCtor<I1, I2, I3>(Indexer_3<I1, I2, I3> key, IKeyNode node)
     {
-      return new Lazy<T, I1, I2, I3>(this, node.Key, key);
+      return new Lazy_4<T, I1, I2, I3>(this, node.Key, key);
     }
 
     Dictionary<string, IDataIndex<T>> Indexes
@@ -393,14 +401,14 @@ namespace Lex.Db
     /// </summary>
     /// <typeparam name="K">Type of the primary key</typeparam>
     /// <returns>Primary index query constructor</returns>
-    public IIndexQuery<T, K> Query<K>()
+    public IIndexQuery_2<T, K> Query<K>()
     {
       return new IndexQuery<T, K>(GetPrimaryIndex<K>());
     }
 
-    internal IDataIndex<T, I1> GetIndex<I1>(string name)
+    internal IDataIndex_2<T, I1> GetIndex<I1>(string name)
     {
-      var result = GetIndex(name) as IDataIndex<T, I1>;
+      var result = GetIndex(name) as IDataIndex_2<T, I1>;
       if (result == null)
         throw new ArgumentException(string.Format("Index {0}<{1}> not found", name, typeof(I1).Name));
 
@@ -413,7 +421,7 @@ namespace Lex.Db
     /// <typeparam name="I1">Type of the indexed component</typeparam>
     /// <param name="name">Name of the index</param>
     /// <returns>New index query constructor</returns>
-    public IIndexQuery<T, I1> IndexQuery<I1>(string name)
+    public IIndexQuery_2<T, I1> IndexQuery<I1>(string name)
     {
       return new IndexQuery<T, I1>(GetIndex<I1>(name));
     }
@@ -425,14 +433,14 @@ namespace Lex.Db
     /// <param name="name">Name of the index</param>
     /// <param name="key">Key value to filter using index</param>
     /// <returns>New index query constructor, set to look for specified key</returns>
-    public IIndexQuery<T, I1> IndexQueryByKey<I1>(string name, I1 key)
+    public IIndexQuery_2<T, I1> IndexQueryByKey<I1>(string name, I1 key)
     {
       return IndexQuery<I1>(name).Key(key);
     }
 
-    internal IDataIndex<T, Indexer<I1, I2>> GetIndex<I1, I2>(string name)
+    internal IDataIndex_2<T, Indexer<I1, I2>> GetIndex<I1, I2>(string name)
     {
-      var result = GetIndex(name) as IDataIndex<T, Indexer<I1, I2>>;
+      var result = GetIndex(name) as IDataIndex_2<T, Indexer<I1, I2>>;
       if (result == null)
         throw new ArgumentException(string.Format("Index {0}<{1}, {2}> not found", name, typeof(I1).Name, typeof(I2).Name));
 
@@ -446,9 +454,9 @@ namespace Lex.Db
     /// <typeparam name="I2">Type of the second indexed component</typeparam>
     /// <param name="name">Name of the index</param>
     /// <returns>New named index query constructor</returns>
-    public IIndexQuery<T, I1, I2> IndexQuery<I1, I2>(string name)
+    public IIndexQuery_3<T, I1, I2> IndexQuery<I1, I2>(string name)
     {
-      return new IndexQuery<T, I1, I2>(GetIndex<I1, I2>(name));
+      return new IndexQuery_3<T, I1, I2>(GetIndex<I1, I2>(name));
     }
 
     /// <summary>
@@ -460,14 +468,14 @@ namespace Lex.Db
     /// <param name="keyPart1">First part of the key to filter using index</param>
     /// <param name="keyPart2">Second part of the key to filter using index</param>
     /// <returns>New named index query constructor, set to look for supplied key components</returns>
-    public IIndexQuery<T, I1, I2> IndexQueryByKey<I1, I2>(string name, I1 keyPart1, I2 keyPart2)
+    public IIndexQuery_3<T, I1, I2> IndexQueryByKey<I1, I2>(string name, I1 keyPart1, I2 keyPart2)
     {
       return IndexQuery<I1, I2>(name).Key(keyPart1, keyPart2);
     }
 
-    internal IDataIndex<T, Indexer<I1, I2, I3>> GetIndex<I1, I2, I3>(string name)
+    internal IDataIndex_2<T, Indexer_3<I1, I2, I3>> GetIndex<I1, I2, I3>(string name)
     {
-      var result = GetIndex(name) as IDataIndex<T, Indexer<I1, I2, I3>>;
+      var result = GetIndex(name) as IDataIndex_2<T, Indexer_3<I1, I2, I3>>;
       if (result == null)
         throw new ArgumentException(string.Format("Index {0}<{1}, {2}, {3}> not found", name, typeof(I1).Name, typeof(I2).Name, typeof(I3).Name));
 
@@ -482,9 +490,9 @@ namespace Lex.Db
     /// <typeparam name="I3">Type of the third indexed component</typeparam>
     /// <param name="name">Name of the index</param>
     /// <returns>New named index query constructor</returns>
-    public IIndexQuery<T, I1, I2, I3> IndexQuery<I1, I2, I3>(string name)
+    public IIndexQuery_4<T, I1, I2, I3> IndexQuery<I1, I2, I3>(string name)
     {
-      return new IndexQuery<T, I1, I2, I3>(GetIndex<I1, I2, I3>(name));
+      return new IndexQuery_4<T, I1, I2, I3>(GetIndex<I1, I2, I3>(name));
     }
 
     /// <summary>
@@ -498,7 +506,7 @@ namespace Lex.Db
     /// <param name="keyPart2">Second part of the key to filter using index</param>
     /// <param name="keyPart3">Third part of the key to filter using index</param>
     /// <returns>New named index query constructor, set to look for supplied key components</returns>
-    public IIndexQuery<T, I1, I2, I3> IndexQueryByKey<I1, I2, I3>(string name, I1 keyPart1, I2 keyPart2, I3 keyPart3)
+    public IIndexQuery_4<T, I1, I2, I3> IndexQueryByKey<I1, I2, I3>(string name, I1 keyPart1, I2 keyPart2, I3 keyPart3)
     {
       return IndexQuery<I1, I2, I3>(name).Key(keyPart1, keyPart2, keyPart3);
     }
@@ -514,7 +522,7 @@ namespace Lex.Db
         getter,
         comparer,
         new[] { member },
-        (k, pk) => new Lazy<T, I1>(this, pk, k));
+        (k, pk) => new Lazy_2<T, I1>(this, pk, k));
     }
 
     internal void CreateIndex<I1, I2>(string name, MemberInfo member1, IComparer<I1> comparer1, MemberInfo member2, IComparer<I2> comparer2)
@@ -523,16 +531,16 @@ namespace Lex.Db
         BuildGetter<I1, I2>(member1, member2),
         new Indexer<I1, I2>.Comparer(comparer1, comparer2),
         new[] { member1, member2 },
-        (k, pk) => new Lazy<T, I1, I2>(this, pk, k));
+        (k, pk) => new Lazy_3<T, I1, I2>(this, pk, k));
     }
 
     internal void CreateIndex<I1, I2, I3>(string name, MemberInfo member1, IComparer<I1> comparer1, MemberInfo member2, IComparer<I2> comparer2, MemberInfo member3, IComparer<I3> comparer3)
     {
       Indexes[name] = CreateIndex(name,
         BuildGetter<I1, I2, I3>(member1, member2, member3),
-        new Indexer<I1, I2, I3>.Comparer(comparer1, comparer2, comparer3),
+        new Indexer_3<I1, I2, I3>.Comparer(comparer1, comparer2, comparer3),
         new[] { member1, member2, member3 },
-        (k, pk) => new Lazy<T, I1, I2, I3>(this, pk, k));
+        (k, pk) => new Lazy_4<T, I1, I2, I3>(this, pk, k));
     }
 
     static Func<T, Indexer<I1, I2>> BuildGetter<I1, I2>(MemberInfo member1, MemberInfo member2)
@@ -550,7 +558,7 @@ namespace Lex.Db
 #endif
     }
 
-    static Func<T, Indexer<I1, I2, I3>> BuildGetter<I1, I2, I3>(MemberInfo member1, MemberInfo member2, MemberInfo member3)
+    static Func<T, Indexer_3<I1, I2, I3>> BuildGetter<I1, I2, I3>(MemberInfo member1, MemberInfo member2, MemberInfo member3)
     {
 #if iOS
       var getter1 = member1.GetGetter<T, I1>();
@@ -560,10 +568,10 @@ namespace Lex.Db
       return obj => new Indexer<I1, I2, I3>(getter1(obj), getter2(obj), getter3(obj));
 #else
       var obj = Expression.Parameter(typeof(T), "obj");
-      var tuple = Expression.New(typeof(Indexer<I1, I2, I3>).GetConstructor(new[] { typeof(I1), typeof(I2), typeof(I3) }),
+      var tuple = Expression.New(typeof(Indexer_3<I1, I2, I3>).GetConstructor(new[] { typeof(I1), typeof(I2), typeof(I3) }),
         obj.Member(member1), obj.Member(member2), obj.Member(member3));
 
-      return Expression.Lambda<Func<T, Indexer<I1, I2, I3>>>(tuple, obj).Compile();
+      return Expression.Lambda<Func<T, Indexer_3<I1, I2, I3>>>(tuple, obj).Compile();
 #endif
     }
 

@@ -2,11 +2,15 @@
 
 namespace Lex.Db.Serialization
 {
-  /// <summary>
-  /// Incapsulates logic to decide which members should be serialized
-  /// </summary>
-  /// <typeparam name="T">Entity type</typeparam>
-  public abstract class Interceptor<T>
+    /// <summary>
+    /// Incapsulates logic to decide which members should be serialized
+    /// </summary>
+    /// <typeparam name="T">Entity type</typeparam>
+#if !WINRT_COMPONENT && !HIDE_PUBLIC
+    public abstract class Interceptor<T>
+#else
+    internal abstract class Interceptor<T>
+#endif
   {
     internal Interceptor<T> _next;
 

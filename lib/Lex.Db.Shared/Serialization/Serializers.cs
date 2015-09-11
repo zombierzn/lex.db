@@ -10,10 +10,14 @@ namespace Lex.Db.Serialization
 {
   using Indexing;
 
-  /// <summary>
-  /// Serialization extender
-  /// </summary>
-  public static class Extender
+    /// <summary>
+    /// Serialization extender
+    /// </summary>
+#if !WINRT_COMPONENT && !HIDE_PUBLIC
+    public static class Extender
+#else
+    internal static class Extender
+#endif
   {
     /// <summary>
     /// Registers static serialization extension before any DbInstance initialization.
@@ -452,7 +456,7 @@ namespace Lex.Db.Serialization
     {
       var baseK = type.GetGenericTypeDefinition();
 
-      if (baseK == typeof(Indexer<,>) || baseK == typeof(Indexer<,,>))
+      if (baseK == typeof(Indexer<,>) || baseK == typeof(Indexer_3<,,>))
         return type.GetStaticMethod("Serialize");
 
       if (baseK == typeof(HashSet<>))
@@ -482,7 +486,7 @@ namespace Lex.Db.Serialization
     {
       var baseK = type.GetGenericTypeDefinition();
 
-      if (baseK == typeof(Indexer<,>) || baseK == typeof(Indexer<,,>))
+      if (baseK == typeof(Indexer<,>) || baseK == typeof(Indexer_3<,,>))
         return type.GetStaticMethod("Deserialize");
 
       if (baseK == typeof(HashSet<>))
@@ -741,10 +745,14 @@ namespace Lex.Db.Serialization
     }
   }
 
-  /// <summary>
-  /// Extended binary reader 
-  /// </summary>
-  public sealed class DataReader : BinaryReader
+    /// <summary>
+    /// Extended binary reader 
+    /// </summary>
+#if !WINRT_COMPONENT && !HIDE_PUBLIC
+    public sealed class DataReader : BinaryReader
+#else
+    internal sealed class DataReader : BinaryReader
+#endif 
   {
     /// <summary>
     /// Creates DataReader with specified owned stream
@@ -830,10 +838,14 @@ namespace Lex.Db.Serialization
 #endif
   }
 
-  /// <summary>
-  /// Extended binary writer
-  /// </summary>
-  public sealed class DataWriter : BinaryWriter
+    /// <summary>
+    /// Extended binary writer
+    /// </summary>
+#if !WINRT_COMPONENT && !HIDE_PUBLIC
+    public sealed class DataWriter : BinaryWriter
+#else
+    internal sealed class DataWriter : BinaryWriter
+#endif
   {
     /// <summary>
     /// Creates DataWriter with specified owned stream

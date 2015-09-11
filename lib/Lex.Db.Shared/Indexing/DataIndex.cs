@@ -15,7 +15,7 @@ namespace Lex.Db.Indexing
     void Update(IKeyNode key, T item);
   }
 
-  interface IDataIndex<T, K> : IDataIndex<T>, IIndex<T, K> where T : class
+  interface IDataIndex_2<T, K> : IDataIndex<T>, IIndex_2<T, K> where T : class
   {
   }
 
@@ -26,17 +26,17 @@ namespace Lex.Db.Indexing
   }
 
   [DebuggerDisplay("{_name} ({ToString()}) : {Count}")]
-  internal class DataIndex<T, K> : IDataIndex<T, K>, IEnumerable<DataNode<K>>, ICleanup where T : class
+  internal class DataIndex<T, K> : IDataIndex_2<T, K>, IEnumerable<DataNode<K>>, ICleanup where T : class
   {
     readonly string _name;
     readonly Func<T, K> _getter;
     readonly MemberInfo[] _keys;
     readonly RBTree<K, DataNode<K>> _tree;
-    readonly DbTable<T> _table;
+    readonly DbTable_1<T> _table;
     readonly Func<K, object, Lazy<T>> _lazyCtor;
     static readonly Func<DataNode<K>> _ctor = RBTree<K, DataNode<K>>._ctor;
 
-    public DataIndex(DbTable<T> loader, string name, Func<T, K> getter, IComparer<K> comparer, Func<K, object, Lazy<T>> lazyCtor, MemberInfo[] members)
+    public DataIndex(DbTable_1<T> loader, string name, Func<T, K> getter, IComparer<K> comparer, Func<K, object, Lazy<T>> lazyCtor, MemberInfo[] members)
     {
       _name = name;
       _keys = members;
@@ -48,7 +48,7 @@ namespace Lex.Db.Indexing
 
     public int Count { get { return _tree.Count; } }
 
-    public DbTable<T> Table { get { return _table; } }
+    public DbTable_1<T> Table { get { return _table; } }
 
     public string Name { get { return _name; } }
 

@@ -11,10 +11,14 @@ using TaskEx = System.Threading.Tasks.Task;
 
 namespace Lex.Db
 {
-  /// <summary>
-  /// Asynchronous extensions for DbTable
-  /// </summary>
-  public static class DbTableAsync
+    /// <summary>
+    /// Asynchronous extensions for DbTable
+    /// </summary>
+#if !WINRT_COMPONENT && !HIDE_PUBLIC
+    public static class DbTableAsync
+#else
+    internal static class DbTableAsync
+#endif
   {
     /// <summary>
     /// Asynchronously loads all entities from table 
@@ -22,7 +26,7 @@ namespace Lex.Db
     /// <typeparam name="T">Type of the entity class</typeparam>
     /// <param name="table">Table of the entity class</param>
     /// <returns>Awaitable Task with array of entities in result</returns>
-    public static Task<T[]> LoadAllAsync<T>(this DbTable<T> table) where T : class
+    public static Task<T[]> LoadAllAsync<T>(this DbTable_1<T> table) where T : class
     {
       return TaskEx.Run(() => table.LoadAll());
     }
@@ -33,7 +37,7 @@ namespace Lex.Db
     /// <typeparam name="T">Type of the entity class</typeparam>
     /// <param name="table">Table of the entity class</param>
     /// <returns>Awaitable Task with count in result</returns>
-    public static Task<int> CountAsync<T>(this DbTable<T> table) where T : class
+    public static Task<int> CountAsync<T>(this DbTable_1<T> table) where T : class
     {
       return TaskEx.Run(() => table.Count());
     }
@@ -67,7 +71,7 @@ namespace Lex.Db
     /// <param name="table">Table of the entity class</param>
     /// <param name="key">The PK value of entity to load</param>
     /// <returns>Awaitable Task with loaded entity in result, or null if not found</returns>
-    public static Task<T> LoadByKeyAsync<T, K>(this DbTable<T> table, K key) where T : class
+    public static Task<T> LoadByKeyAsync<T, K>(this DbTable_1<T> table, K key) where T : class
     {
       return TaskEx.Run(() => table.LoadByKey(key));
     }
@@ -81,7 +85,7 @@ namespace Lex.Db
     /// <param name="keys">The enumeration of PK values to load</param>
     /// <param name="yieldNotFound">Specifies that missing records should be ignored or returnes as nulls</param>
     /// <returns>Awaitable Task with enumeration of loaded entities in result</returns>
-    public static Task<IEnumerable<T>> LoadByKeysAsync<T, K>(this DbTable<T> table, IEnumerable<K> keys, bool yieldNotFound = false) where T : class
+    public static Task<IEnumerable<T>> LoadByKeysAsync<T, K>(this DbTable_1<T> table, IEnumerable<K> keys, bool yieldNotFound = false) where T : class
     {
       return TaskEx.Run(() => table.LoadByKeys(keys, yieldNotFound));
     }
@@ -93,7 +97,7 @@ namespace Lex.Db
     /// <typeparam name="K">Type of the index</typeparam>
     /// <param name="query">Indexed query to execute</param>
     /// <returns>Awaitable Task with enumeration of loaded entities in result</returns>
-    public static Task<List<T>> ToListAsync<T, K>(this IIndexQuery<T, K> query) where T : class
+    public static Task<List<T>> ToListAsync<T, K>(this IIndexQuery_2<T, K> query) where T : class
     {
       return TaskEx.Run(() => query.ToList());
     }
@@ -105,7 +109,7 @@ namespace Lex.Db
     /// <typeparam name="K">Type of the index</typeparam>
     /// <param name="query">Indexed query to execute</param>
     /// <returns>Awaitable Task with enumeration of loaded entities in result</returns>
-    public static Task<List<Lazy<T, K>>> ToLazyListAsync<T, K>(this IIndexQuery<T, K> query) where T : class
+    public static Task<List<Lazy_2<T, K>>> ToLazyListAsync<T, K>(this IIndexQuery_2<T, K> query) where T : class
     {
       return TaskEx.Run(() => query.ToLazyList());
     }
@@ -117,7 +121,7 @@ namespace Lex.Db
     /// <typeparam name="K">Type of the index</typeparam>
     /// <param name="query">Indexed query to count result</param>
     /// <returns>Awaitable Task with number of entities in result</returns>
-    public static Task<int> CountAsync<T, K>(this IIndexQuery<T, K> query) where T : class
+    public static Task<int> CountAsync<T, K>(this IIndexQuery_2<T, K> query) where T : class
     {
       return TaskEx.Run(() => query.Count());
     }
@@ -130,7 +134,7 @@ namespace Lex.Db
     /// <typeparam name="K2">Type of the second component index</typeparam>
     /// <param name="query">Indexed query to execute</param>
     /// <returns>Awaitable Task with enumeration of loaded entities in result</returns>
-    public static Task<List<T>> ToListAsync<T, K1, K2>(this IIndexQuery<T, K1, K2> query) where T : class
+    public static Task<List<T>> ToListAsync<T, K1, K2>(this IIndexQuery_3<T, K1, K2> query) where T : class
     {
         return TaskEx.Run(() => query.ToList());
     }
@@ -143,7 +147,7 @@ namespace Lex.Db
     /// <typeparam name="K2">Type of the second component index</typeparam>
     /// <param name="query">Indexed query to execute</param>
     /// <returns>Awaitable Task with enumeration of loaded entities in result</returns>
-    public static Task<List<Lazy<T, K1, K2>>> ToLazyListAsync<T, K1, K2>(this IIndexQuery<T, K1, K2> query) where T : class
+    public static Task<List<Lazy_3<T, K1, K2>>> ToLazyListAsync<T, K1, K2>(this IIndexQuery_3<T, K1, K2> query) where T : class
     {
         return TaskEx.Run(() => query.ToLazyList());
     }
@@ -156,7 +160,7 @@ namespace Lex.Db
     /// <typeparam name="K2">Type of the second component index</typeparam>
     /// <param name="query">Indexed query to count result</param>
     /// <returns>Awaitable Task with number of entities in result</returns>
-    public static Task<int> CountAsync<T, K1, K2>(this IIndexQuery<T, K1, K2> query) where T : class
+    public static Task<int> CountAsync<T, K1, K2>(this IIndexQuery_3<T, K1, K2> query) where T : class
     {
         return TaskEx.Run(() => query.Count());
     }
@@ -170,7 +174,7 @@ namespace Lex.Db
     /// <typeparam name="K3">Type of the third component index</typeparam>
     /// <param name="query">Indexed query to execute</param>
     /// <returns>Awaitable Task with enumeration of loaded entities in result</returns>
-    public static Task<List<T>> ToListAsync<T, K1, K2, K3>(this IIndexQuery<T, K1, K2, K3> query) where T : class
+    public static Task<List<T>> ToListAsync<T, K1, K2, K3>(this IIndexQuery_4<T, K1, K2, K3> query) where T : class
     {
         return TaskEx.Run(() => query.ToList());
     }
@@ -184,7 +188,7 @@ namespace Lex.Db
     /// <typeparam name="K3">Type of the third component index</typeparam>
     /// <param name="query">Indexed query to execute</param>
     /// <returns>Awaitable Task with enumeration of loaded entities in result</returns>
-    public static Task<List<Lazy<T, K1, K2, K3>>> ToLazyListAsync<T, K1, K2, K3>(this IIndexQuery<T, K1, K2, K3> query) where T : class
+    public static Task<List<Lazy_4<T, K1, K2, K3>>> ToLazyListAsync<T, K1, K2, K3>(this IIndexQuery_4<T, K1, K2, K3> query) where T : class
     {
         return TaskEx.Run(() => query.ToLazyList());
     }
@@ -198,7 +202,7 @@ namespace Lex.Db
     /// <typeparam name="K3">Type of the third component index</typeparam>
     /// <param name="query">Indexed query to count result</param>
     /// <returns>Awaitable Task with number of entities in result</returns>
-    public static Task<int> CountAsync<T, K1, K2, K3>(this IIndexQuery<T, K1, K2, K3> query) where T : class
+    public static Task<int> CountAsync<T, K1, K2, K3>(this IIndexQuery_4<T, K1, K2, K3> query) where T : class
     {
         return TaskEx.Run(() => query.Count());
     }
@@ -210,7 +214,7 @@ namespace Lex.Db
     /// <param name="table">Table of the entity class</param>
     /// <param name="item">Entity to reload from table</param>
     /// <returns>Awaitable Task with reloaded entity in result</returns>
-    public static Task<T> RefreshAsync<T>(this DbTable<T> table, T item) where T : class
+    public static Task<T> RefreshAsync<T>(this DbTable_1<T> table, T item) where T : class
     {
       return TaskEx.Run(() => table.Refresh(item));
     }
@@ -222,7 +226,7 @@ namespace Lex.Db
     /// <param name="table">Table of the entity class</param>
     /// <param name="items">Enumeration of entities to save</param>
     /// <returns>Awaitable Task of the save operation</returns>
-    public static Task SaveAsync<T>(this DbTable<T> table, IEnumerable<T> items) where T : class
+    public static Task SaveAsync<T>(this DbTable_1<T> table, IEnumerable<T> items) where T : class
     {
       return TaskEx.Run(() => table.Save(items));
     }
@@ -234,7 +238,7 @@ namespace Lex.Db
     /// <param name="table">Table of the entity class</param>
     /// <param name="item">Entity to save</param>
     /// <returns>Awaitable Task of the save operation</returns>
-    public static Task SaveAsync<T>(this DbTable<T> table, T item) where T : class
+    public static Task SaveAsync<T>(this DbTable_1<T> table, T item) where T : class
     {
       return TaskEx.Run(() => table.Save(item));
     }
@@ -270,7 +274,7 @@ namespace Lex.Db
     /// <param name="table">Table of the entity class</param>
     /// <param name="item">Entity to delete</param>
     /// <returns>Awaitable Task with success flag in result</returns>
-    public static Task<bool> DeleteAsync<T>(this DbTable<T> table, T item) where T : class
+    public static Task<bool> DeleteAsync<T>(this DbTable_1<T> table, T item) where T : class
     {
       return TaskEx.Run(() => table.Delete(item));
     }
@@ -282,7 +286,7 @@ namespace Lex.Db
     /// <param name="table">Table of the entity class</param>
     /// <param name="items">Entities to delete</param>
     /// <returns>Awaitable Task with count of successfully deleted entities in result</returns>
-    public static Task<int> DeleteAsync<T>(this DbTable<T> table, IEnumerable<T> items) where T : class
+    public static Task<int> DeleteAsync<T>(this DbTable_1<T> table, IEnumerable<T> items) where T : class
     {
       return TaskEx.Run(() => table.Delete(items));
     }

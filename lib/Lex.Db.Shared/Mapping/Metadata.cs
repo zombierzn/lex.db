@@ -9,8 +9,11 @@ using System.Reflection;
 namespace Lex.Db.Mapping
 {
   using Serialization;
-
-  public interface IMetadata
+#if !WINRT_COMPONENT && !HIDE_PUBLIC
+    public interface IMetadata
+#else
+    internal interface IMetadata
+#endif
   {
     string Name { get; }
     Type Key { get; }
@@ -31,7 +34,7 @@ namespace Lex.Db.Mapping
 
       for (int i = 0; i < count; ++i)
       {
-        var map = new MemberMap<T>(reader);
+        var map = new MemberMapT<T>(reader);
         _members.Add(map.Id, map);
       }
     }
@@ -62,7 +65,7 @@ namespace Lex.Db.Mapping
 
     public DbType Key;
 
-    Dictionary<int, MemberMap<T>> _members = new Dictionary<int, MemberMap<T>>();
+    Dictionary<int, MemberMapT<T>> _members = new Dictionary<int, MemberMapT<T>>();
     byte[] _blob;
     uint _hash;
 
@@ -85,7 +88,7 @@ namespace Lex.Db.Mapping
       }
     }
 
-    public void Add(MemberMap<T> member)
+    public void Add(MemberMapT<T> member)
     {
       member.Id = _members.Count;
       _members.Add(member.Id, member);
@@ -177,8 +180,8 @@ namespace Lex.Db.Mapping
       if (!Key.Equals(masters.Key))
         throw new InvalidOperationException("Incompatible table storage");
 
-      var local = new HashSet<MemberMap<T>>(_members.Values);
-      var all = new List<MemberMap<T>>(local);
+      var local = new HashSet<MemberMapT<T>>(_members.Values);
+      var all = new List<MemberMapT<T>>(local);
 
       // transfer ids from master members
       foreach (var master in masters._members.Values)

@@ -4,17 +4,22 @@ namespace Lex.Db
 {
   using Indexing;
 
-  /// <summary>
-  /// Provides support for lazy initialization
-  /// </summary>
-  /// <typeparam name="T">Specifies the type of entity that is being lazily loaded</typeparam>
-  public abstract class Lazy<T> where T : class
-  {
+    /// <summary>
+    /// Provides support for lazy initialization
+    /// </summary>
+    /// <typeparam name="T">Specifies the type of entity that is being lazily loaded</typeparam>
+#if !WINRT_COMPONENT && !HIDE_PUBLIC
+    public abstract class Lazy<T>
+#else
+    internal abstract class Lazy<T>
+#endif
+    where T : class
+    {
     T _result;
-    DbTable<T> _table;
+    DbTable_1<T> _table;
     Exception _error;
 
-    internal Lazy(DbTable<T> table, object pk)
+    internal Lazy(DbTable_1<T> table, object pk)
     {
       PK = pk;
       _table = table;
@@ -63,34 +68,44 @@ namespace Lex.Db
     }
   }
 
-  /// <summary>
-  /// Provides support for lazy entity loading as well as access to index value consisting from one component
-  /// </summary>
-  /// <typeparam name="T">Specifies the type of entity that is being lazily loaded</typeparam>
-  /// <typeparam name="I1">Type of the index component</typeparam>
-  public sealed class Lazy<T, I1> : Lazy<T> where T : class
+    /// <summary>
+    /// Provides support for lazy entity loading as well as access to index value consisting from one component
+    /// </summary>
+    /// <typeparam name="T">Specifies the type of entity that is being lazily loaded</typeparam>
+    /// <typeparam name="I1">Type of the index component</typeparam>
+#if !WINRT_COMPONENT && !HIDE_PUBLIC
+    public sealed class Lazy_2<T, I1> : Lazy<T>
+#else
+    internal sealed class Lazy_2<T, I1> : Lazy<T>
+#endif
+   where T : class
   {
     /// <summary>
     /// Index component
     /// </summary>
     public readonly I1 Key;
 
-    internal Lazy(DbTable<T> table, object pk, I1 key)
+    internal Lazy_2(DbTable_1<T> table, object pk, I1 key)
       : base(table, pk)
     {
       Key = key;
     }
   }
 
-  /// <summary>
-  /// Provides support for lazy entity loading as well as access to index value consisting from two components
-  /// </summary>
-  /// <typeparam name="T">Specifies the type of entity that is being lazily loaded</typeparam>
-  /// <typeparam name="I1">Type of the first index component</typeparam>
-  /// <typeparam name="I2">Type of the second index component</typeparam>
-  public sealed class Lazy<T, I1, I2> : Lazy<T> where T : class
+    /// <summary>
+    /// Provides support for lazy entity loading as well as access to index value consisting from two components
+    /// </summary>
+    /// <typeparam name="T">Specifies the type of entity that is being lazily loaded</typeparam>
+    /// <typeparam name="I1">Type of the first index component</typeparam>
+    /// <typeparam name="I2">Type of the second index component</typeparam>
+#if !WINRT_COMPONENT && !HIDE_PUBLIC
+    public sealed class Lazy_3<T, I1, I2> : Lazy<T> 
+#else
+    internal sealed class Lazy_3<T, I1, I2> : Lazy<T>
+#endif
+    where T : class
   {
-    internal Lazy(DbTable<T> table, object pk, Indexer<I1, I2> source)
+    internal Lazy_3(DbTable_1<T> table, object pk, Indexer<I1, I2> source)
       : base(table, pk)
     {
       Key1 = source.Key1;
@@ -108,16 +123,21 @@ namespace Lex.Db
     public readonly I2 Key2;
   }
 
-  /// <summary>
-  /// Provides support for lazy entity loading as well as access to index value consisting from three components
-  /// </summary>
-  /// <typeparam name="T">Specifies the type of entity that is being lazily loaded</typeparam>
-  /// <typeparam name="I1">Type of the first index component</typeparam>
-  /// <typeparam name="I2">Type of the second index component</typeparam>
-  /// <typeparam name="I3">Type of the third index component</typeparam>
-  public sealed class Lazy<T, I1, I2, I3> : Lazy<T> where T : class
+    /// <summary>
+    /// Provides support for lazy entity loading as well as access to index value consisting from three components
+    /// </summary>
+    /// <typeparam name="T">Specifies the type of entity that is being lazily loaded</typeparam>
+    /// <typeparam name="I1">Type of the first index component</typeparam>
+    /// <typeparam name="I2">Type of the second index component</typeparam>
+    /// <typeparam name="I3">Type of the third index component</typeparam>
+#if !WINRT_COMPONENT && !HIDE_PUBLIC
+    public sealed class Lazy_4<T, I1, I2, I3> : Lazy<T>
+#else
+    internal sealed class Lazy_4<T, I1, I2, I3> : Lazy<T>
+#endif
+   where T : class
   {
-    internal Lazy(DbTable<T> table, object pk, Indexer<I1, I2, I3> source)
+    internal Lazy_4(DbTable_1<T> table, object pk, Indexer_3<I1, I2, I3> source)
       : base(table, pk)
     {
       Key1 = source.Key1;

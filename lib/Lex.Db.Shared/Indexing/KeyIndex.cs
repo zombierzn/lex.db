@@ -10,7 +10,7 @@ namespace Lex.Db.Indexing
   using Mapping;
   using Serialization;
 
-  interface IKeyIndex<T> : IIndex<T> where T : class
+  interface IKeyIndex_1<T> : IIndex<T> where T : class
   {
     Type KeyType { get; }
     long GetFileSize();
@@ -37,7 +37,7 @@ namespace Lex.Db.Indexing
     int DeleteByObjectKeys(IEnumerable<object> keys);
   }
 
-  interface IKeyIndex<T, K> : IKeyIndex<T>, IIndex<T, K> where T : class
+  interface IKeyIndex<T, K> : IKeyIndex_1<T>, IIndex_2<T, K> where T : class
   {
     K MinKey { get; }
     K MaxKey { get; }
@@ -178,11 +178,11 @@ namespace Lex.Db.Indexing
     readonly Func<T, K> _getter;
     readonly Action<T, K> _setter;
     readonly RBTree<K, KeyNode<K>> _tree;
-    readonly DbTable<T> _table;
+    readonly DbTable_1<T> _table;
     readonly MemberInfo[] _keys;
     static readonly Func<KeyNode<K>> _ctor = RBTree<K, KeyNode<K>>._ctor;
 
-    public KeyIndex(DbTable<T> table, Func<T, K> getter, MemberInfo key, IComparer<K> comparer)
+    public KeyIndex(DbTable_1<T> table, Func<T, K> getter, MemberInfo key, IComparer<K> comparer)
     {
       _tree = new RBTree<K, KeyNode<K>>(comparer);
       _getter = getter;
@@ -208,7 +208,7 @@ namespace Lex.Db.Indexing
 #endif
     }
 
-    public DbTable<T> Table { get { return _table; } }
+    public DbTable_1<T> Table { get { return _table; } }
 
     string IIndex<T>.Name { get { return null; } }
 
@@ -249,7 +249,7 @@ namespace Lex.Db.Indexing
       return result;
     }
 
-    Location<T> IKeyIndex<T>.GetLocation(IKeyNode node)
+    Location<T> IKeyIndex_1<T>.GetLocation(IKeyNode node)
     {
       return GetLocation((KeyNode<K>)node, true);
     }
@@ -451,7 +451,7 @@ namespace Lex.Db.Indexing
       _map = new DataMap<K>(_tree);
     }
 
-    object[] IKeyIndex<T>.MakeKeyList()
+    object[] IKeyIndex_1<T>.MakeKeyList()
     {
       return _tree.Select(i => (object)i.Key);
     }

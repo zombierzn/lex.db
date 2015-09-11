@@ -15,8 +15,11 @@ namespace Lex.Db
     Initial = 0x0,
     Current = 0x1
   }
-
-  public interface IMemberMap
+#if !WINRT_COMPONENT && !HIDE_PUBLIC
+    public interface IMemberMap
+#else
+    internal interface IMemberMap
+#endif
   {
     string Name { get; }
     Type Type { get; }
@@ -118,11 +121,11 @@ namespace Lex.Db
     #endregion
   }
 
-  class MemberMap<T> : MemberMap
+  class MemberMapT<T> : MemberMap
   {
-    public MemberMap(MemberInfo member, Expression target = null, ParameterExpression self = null) : base(member, target, self) { }
+    public MemberMapT(MemberInfo member, Expression target = null, ParameterExpression self = null) : base(member, target, self) { }
 
-    public MemberMap(DataReader reader) : base(reader) { }
+    public MemberMapT(DataReader reader) : base(reader) { }
 
     public Action<DataReader, T> Deserialize;
   }

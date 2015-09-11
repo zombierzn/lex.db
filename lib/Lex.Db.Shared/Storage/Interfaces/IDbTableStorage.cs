@@ -2,10 +2,14 @@
 
 namespace Lex.Db
 {
-  /// <summary>
-  /// Table size information container
-  /// </summary>
-  public class DbTableInfo
+    /// <summary>
+    /// Table size information container
+    /// </summary>
+#if !WINRT_COMPONENT && !HIDE_PUBLIC
+    public class DbTableInfo
+#else
+    internal class DbTableInfo
+#endif
   {
     /// <summary>
     /// Actual size of the index file

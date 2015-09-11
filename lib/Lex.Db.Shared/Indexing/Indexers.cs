@@ -59,13 +59,13 @@ namespace Lex.Db.Indexing
     }
   }
 
-  class Indexer<I1, I2, I3>
+  class Indexer_3<I1, I2, I3>
   {
     public readonly I1 Key1;
     public readonly I2 Key2;
     public readonly I3 Key3;
 
-    public Indexer(I1 key1, I2 key2, I3 key3)
+    public Indexer_3(I1 key1, I2 key2, I3 key3)
     {
       Key1 = key1;
       Key2 = key2;
@@ -84,19 +84,19 @@ namespace Lex.Db.Indexing
     public static Func<DataReader, object> Reader = r => Deserialize(r);
 #endif
 
-    internal static void Serialize(DataWriter writer, Indexer<I1, I2, I3> value)
+    internal static void Serialize(DataWriter writer, Indexer_3<I1, I2, I3> value)
     {
       _serializer1(writer, value.Key1);
       _serializer2(writer, value.Key2);
       _serializer3(writer, value.Key3);
     }
 
-    internal static Indexer<I1, I2, I3> Deserialize(DataReader reader)
+    internal static Indexer_3<I1, I2, I3> Deserialize(DataReader reader)
     {
-      return new Indexer<I1, I2, I3>(_deserializer1(reader), _deserializer2(reader), _deserializer3(reader));
+      return new Indexer_3<I1, I2, I3>(_deserializer1(reader), _deserializer2(reader), _deserializer3(reader));
     }
 
-    public class Comparer : IComparer<Indexer<I1, I2, I3>>
+    public class Comparer : IComparer<Indexer_3<I1, I2, I3>>
     {
       readonly IComparer<I1> _comparer1;
       readonly IComparer<I2> _comparer2;
@@ -109,7 +109,7 @@ namespace Lex.Db.Indexing
         _comparer3 = comparer3 ?? Comparer<I3>.Default;
       }
 
-      public int Compare(Indexer<I1, I2, I3> x, Indexer<I1, I2, I3> y)
+      public int Compare(Indexer_3<I1, I2, I3> x, Indexer_3<I1, I2, I3> y)
       {
         var result = _comparer1.Compare(x.Key1, y.Key1);
         if (result != 0)

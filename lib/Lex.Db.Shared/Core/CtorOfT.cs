@@ -42,7 +42,7 @@ namespace Lex.Db
   /// </remarks>
   /// <typeparam name="T">Type to construct</typeparam>
   /// <typeparam name="R">Type to return</typeparam>
-  static class Ctor<R, T> where T : R
+  static class Ctor_2<R, T> where T : R
   {
 #if NLOG
     static readonly Logger Log = LogManager.GetCurrentClassLogger();

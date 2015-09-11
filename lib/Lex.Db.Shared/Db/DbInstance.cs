@@ -9,10 +9,14 @@ namespace Lex.Db
 {
   using Mapping;
 
-  /// <summary>
-  /// Database access and management
-  /// </summary>
-  public class DbInstance : IDisposable
+    /// <summary>
+    /// Database access and management
+    /// </summary>
+#if !WINRT_COMPONENT && !HIDE_PUBLIC
+    public class DbInstance : IDisposable
+#else
+    internal class DbInstance : IDisposable
+#endif
   {
     static readonly IDbStorage Storage = new DbStorage();
     internal readonly IDbSchemaStorage _schema;
@@ -146,7 +150,7 @@ namespace Lex.Db
     /// </summary>
     /// <typeparam name="T">Entity type</typeparam>
     /// <returns>Entity T mapping configurator</returns>
-    public TypeMap<T> Map<T>() where T : class, new()
+    public TypeMap_1<T> Map<T>() where T : class, new()
     {
       return Map<T>(Ctor<T>.New);
     }
@@ -157,7 +161,7 @@ namespace Lex.Db
     /// <typeparam name="T">Entity prototype</typeparam>
     /// <param name="ctor">Entity implementation constructor</param>
     /// <returns>Entity T mapping configurator</returns>
-    public TypeMap<T> Map<T>(Func<T> ctor) where T : class
+    public TypeMap_1<T> Map<T>(Func<T> ctor) where T : class
     {
       if (ctor == null)
         throw new ArgumentNullException("ctor");
@@ -169,9 +173,9 @@ namespace Lex.Db
         TypeMap result;
 
         if (_maps.TryGetValue(typeof(T), out result))
-          return (TypeMap<T>)result;
+          return (TypeMap_1<T>)result;
 
-        var map = new TypeMap<T>(this, ctor);
+        var map = new TypeMap_1<T>(this, ctor);
 
         _maps[typeof(T)] = map;
 
@@ -185,11 +189,11 @@ namespace Lex.Db
     /// <typeparam name="T">Entity prototype</typeparam>
     /// <typeparam name="TClass">Entity implementation type</typeparam>
     /// <returns>Entity T mapping configurator</returns>
-    public TypeMap<T> Map<T, TClass>()
+    public TypeMap_1<T> Map<T, TClass>()
       where T : class
       where TClass : T, new()
     {
-      return Map<T>(Ctor<T, TClass>.New);
+      return Map<T>(Ctor_2<T, TClass>.New);
     }
 
     /// <summary>
@@ -197,7 +201,7 @@ namespace Lex.Db
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    public DbTable<T> Table<T>() where T : class
+    public DbTable_1<T> Table<T>() where T : class
     {
       CheckSealed();
 
@@ -206,7 +210,7 @@ namespace Lex.Db
       if (!_tables.TryGetValue(typeof(T), out result))
         throw new ArgumentException(string.Format("Type {0} is not registered with this DbInstance", typeof(T).Name));
 
-      return (DbTable<T>)result;
+      return (DbTable_1<T>)result;
     }
 
     /// <summary>
@@ -709,8 +713,11 @@ namespace Lex.Db
   }
 
 #if DEBUG
-
-  public class DbExplorer : DbInstance
+#if !WINRT_COMPONENT && !HIDE_PUBLIC
+    public class DbExplorer : DbInstance
+#else
+    internal class DbExplorer : DbInstance
+#endif
   {
     public DbExplorer(string path) : base(path) { }
 
@@ -735,7 +742,7 @@ namespace Lex.Db
     /// Provides database table infrastructure to read/write/query entities
     /// </summary>
     /// <returns></returns>
-    public DbTable<object[]> Table(string name)
+    public DbTable_1<object[]> Table(string name)
     {
       CheckSealed();
 
@@ -747,7 +754,7 @@ namespace Lex.Db
       if (!_namedTables.TryGetValue(name, out result))
         throw new ArgumentException(string.Format("Type {0} is not registered with this DbInstance", name));
 
-      return (DbTable<object[]>)result;
+      return (DbTable_1<object[]>)result;
     }
 
     protected override IEnumerable<DbTable> GetTables()
@@ -778,7 +785,7 @@ namespace Lex.Db
     DbTable CreateTable(Metadata<object[]> md, string name)
     {
       var cnt = md.MemberCount;
-      var result = new DbTable<object[]>(this, () => new object[cnt]);
+      var result = new DbTable_1<object[]>(this, () => new object[cnt]);
       result.Name = name;
 
       InitPK(result, md.Key.Type);
@@ -829,10 +836,10 @@ namespace Lex.Db
       }
     }
 
-    void InitPK(DbTable<object[]> table, Type pk)
+    void InitPK(DbTable_1<object[]> table, Type pk)
     {
 #if NETFX_CORE
-      var keyMethod = GetType().GetRuntimeMethod("InitPKCore", new Type[] { typeof(DbTable<object[]>) });
+      var keyMethod = GetType().GetRuntimeMethod("InitPKCore", new Type[] { typeof(DbTable_1<object[]>) });
 #else
       var keyMethod = GetType().GetMethod("InitPKCore", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
 #endif
@@ -841,7 +848,7 @@ namespace Lex.Db
       pkKeyMethod.Invoke(this, new object[] { table });
     }
 
-    void InitPKCore<T>(DbTable<object[]> table)
+    void InitPKCore<T>(DbTable_1<object[]> table)
     {
       table.Add(i => (T)i[0], null, false);
     }
@@ -862,11 +869,11 @@ namespace Lex.Db
     /// <summary>
     /// Provides list of known tables
     /// </summary>
-    public new IEnumerable<DbTable<object[]>> AllTables()
+    public new IEnumerable<DbTable_1<object[]>> AllTables()
     {
       CheckSealed();
 
-      return GetTables().OfType<DbTable<object[]>>();
+      return GetTables().OfType<DbTable_1<object[]>>();
     }
   }
 

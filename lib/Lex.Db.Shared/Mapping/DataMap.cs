@@ -142,7 +142,9 @@ namespace Lex.Db.Mapping
     }
 
 #endif
-[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+#if NETFX_CORE
+ [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+#endif
     void Gather(KeyNode<K> node)
     {
       if (node != null)
